@@ -1,14 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_list_app/data/dummy_items.dart';
+import 'package:shopping_list_app/widgets/new_item.dart';
 
-class GroceryList extends StatelessWidget {
-  const GroceryList({super.key});
+class GroceryListScreen extends StatefulWidget {
+  const GroceryListScreen({super.key});
+
+  @override
+  State<GroceryListScreen> createState() => _GroceryListScreenState();
+}
+
+class _GroceryListScreenState extends State<GroceryListScreen> {
+  void _addItem() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) => const NewItemScreen(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your groceries'),
+        actions: [
+          IconButton(
+            onPressed: _addItem,
+            icon: const Icon(Icons.add),
+          ),
+        ],
       ),
       body: ListView.builder(
         itemCount: groceryItems.length,
