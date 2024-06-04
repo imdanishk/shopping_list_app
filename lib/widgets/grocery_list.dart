@@ -23,12 +23,16 @@ class _GroceryListScreenState extends State<GroceryListScreen> {
     _loadItems();
   }
 
+  // Method to load items from the backend
   void _loadItems() async {
+    // URL to fetch the grocery items from the Firebase database
     final url = Uri.https(
-      'flutter-learning-shoppng-list-default-rtdb.firebaseio.com',
+      'flutter-learning-shopping-list-default-rtdb.firebaseio.com',
       'shopping-list.json',
     );
+
     try {
+      // Send a GET request to the URL
       final response = await http.get(url);
 
       if (response.statusCode >= 400) {
@@ -37,6 +41,8 @@ class _GroceryListScreenState extends State<GroceryListScreen> {
         });
       }
 
+      // If the response body is 'null', it means no data is available
+      // and dont execute code below of this
       if (response.body == 'null') {
         setState(() {
           _isLoading = false;
@@ -44,8 +50,11 @@ class _GroceryListScreenState extends State<GroceryListScreen> {
         return;
       }
 
+      // Decode the response body from JSON
       final Map<String, dynamic> listData = json.decode(response.body);
       final List<GroceryItem> loadedItems = [];
+
+      // Loop through the list data and create GroceryItem objects
       for (final item in listData.entries) {
         final category = categories.entries
             .firstWhere(
@@ -60,42 +69,56 @@ class _GroceryListScreenState extends State<GroceryListScreen> {
           ),
         );
       }
+
+      // Update the state with the loaded items and set loading to false
       setState(() {
         _groceryItems = loadedItems;
         _isLoading = false;
       });
     } catch (error) {
+      // Handle any errors that occur during the request
       setState(() {
         _error = 'Something went wrong! Please try again later.';
       });
     }
   }
 
+
+  // Method to navigate to the NewItemScreen and add a new item
   void _addItem() async {
+    // Navigate to the NewItemScreen to get the new item details
     await Navigator.of(context).push<GroceryItem>(
       MaterialPageRoute(
         builder: (ctx) => const NewItemScreen(),
       ),
     );
 
+    // Reload the items after adding a new one
     _loadItems();
   }
 
+
+  // Method to remove an item from the backend and the local list
   void _removeItem(GroceryItem item) async {
+    // Get the index of the item to be removed
     final index = _groceryItems.indexOf(item);
     setState(() {
+      // Remove the item from the local list
       _groceryItems.remove(item);
     });
 
+    // URL to delete the item from the Firebase database
     final url = Uri.https(
       'flutter-learning-shopping-list-default-rtdb.firebaseio.com',
       'shopping-list/${item.id}.json',
     );
 
+    // Send a DELETE request to the URL
     final response = await http.delete(url);
 
     if (response.statusCode >= 400) {
-      // Optional: Show error message
+      // Optional: Also can show error message
+      // Reinsert the item back into the list if there was an error
       setState(() {
         _groceryItems.insert(index, item);
       });

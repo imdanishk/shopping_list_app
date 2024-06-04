@@ -20,16 +20,23 @@ class _NewItemScreenState extends State<NewItemScreen> {
   var _selectedCategory = categories[Categories.vegetables]!;
   var _isSending = false;
 
+  // Method to save the new item
   void _saveItem() async {
+    // Check if the form is valid
     if (_formKey.currentState!.validate()) {
+      // Save the form data
       _formKey.currentState!.save();
       setState(() {
         _isSending = true;
       });
+
+      // URL to post the new item to the Firebase database
       final url = Uri.https(
         'flutter-learning-shopping-list-default-rtdb.firebaseio.com',
         'shopping-list.json',
       );
+
+      // Send a POST request to add the new item
       final response = await http.post(
         url,
         headers: {
@@ -44,12 +51,16 @@ class _NewItemScreenState extends State<NewItemScreen> {
         ),
       );
 
+      // Decode the response body from JSON
       final Map<String, dynamic> responseData = json.decode(response.body);
 
+      // Check if the context is still mounted, if not
+      // dont execute code below this line
       if (!context.mounted) {
         return;
       }
 
+      // Pass the newly created item back to the previous screen (grocery list screen)
       Navigator.of(context).pop(
         GroceryItem(
           id: responseData['name'],
@@ -58,15 +69,6 @@ class _NewItemScreenState extends State<NewItemScreen> {
           category: _selectedCategory,
         ),
       );
-
-      // Navigator.of(context).pop(
-      //   GroceryItem(
-      //     id: DateTime.now().toString(),
-      //     name: _enteredName,
-      //     quantity: _enteredQuantity,
-      //     category: _selectedCategory,
-      //   ),
-      // );
     }
   }
 
