@@ -5,6 +5,9 @@ import 'package:shopping_list_app/widgets/new_item.dart';
 import '../data/categories.dart';
 import '../models/grocery_item.dart';
 
+
+// Here, FutureBuilder caused error due to complexity of UI
+
 class GroceryListScreen extends StatefulWidget {
   const GroceryListScreen({super.key});
 
@@ -25,8 +28,9 @@ class _GroceryListScreenState extends State<GroceryListScreen> {
 
   Future<List<GroceryItem>> _loadItems() async {
     final url = Uri.https(
-        'flutter-learning-shopping-list-default-rtdb.firebaseio.com',
-        'shopping-list.json');
+      'flutter-learning-shopping-list-default-rtdb.firebaseio.com',
+      'shopping-list.json',
+    );
 
     final response = await http.get(url);
 
